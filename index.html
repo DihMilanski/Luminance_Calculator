@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luminância RGB Calculator - Rec.709</title>
+    <title>Luminance RGB Calculator - Rec.709</title>
     <style>
         * {
             margin: 0;
@@ -311,7 +311,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Luminância RGB</h1>
+        <h1>Luminance RGB</h1>
         <p class="subtitle">Rec.709 Calculator</p>
 
         <!-- Input RGB -->
@@ -335,9 +335,9 @@
 
         <div class="divider"></div>
 
-        <!-- Resultado Luminância -->
+        <!-- Luminance Result -->
         <div class="result-section">
-            <div class="result-label">Luminância (Linear)</div>
+            <div class="result-label">Luminance (Linear)</div>
             <div class="result-value" id="luminance">0.0000</div>
             <div class="result-range">
                 <strong>Ranges Polyplant:</strong>
@@ -391,14 +391,14 @@
 
         <!-- Correção -->
         <div class="correction-section">
-            <div class="result-label">Correção de Luminância</div>
+            <div class="result-label">Correction of Luminance</div>
             <div class="correction-input-group">
                 <div class="correction-input">
-                    <span class="correction-label">Luminância Atual</span>
+                    <span class="correction-label">Luminance Atual</span>
                     <input type="number" id="current-lum" class="correction-field" placeholder="Auto" readonly>
                 </div>
                 <div class="correction-input">
-                    <span class="correction-label">Luminância Target</span>
+                    <span class="correction-label">Luminance Target</span>
                     <input type="number" id="target-lum" class="correction-field" placeholder="0.30" min="0.01" max="1" step="0.01" value="0.30">
                 </div>
             </div>
@@ -408,7 +408,7 @@
                 <div class="correction-result-value" id="correction-factor">1.00x</div>
             </div>
 
-            <button class="copy-button" id="copy-factor">Copiar Fator</button>
+            <button class="copy-button" id="copy-factor">Copy Fator</button>
         </div>
 
         <div class="divider"></div>
@@ -438,7 +438,7 @@
                 </div>
             </div>
 
-            <button class="copy-button" id="copy-rgb01">Copiar RGB 0-1</button>
+            <button class="copy-button" id="copy-rgb01">Copy RGB 0-1</button>
         </div>
 
         <!-- Material References Database -->
@@ -446,7 +446,7 @@
             <div class="result-label">Material References (Polyplant)</div>
             
             <select id="material-select" style="width: 100%; padding: 10px; border-radius: 6px; background: #1a1a1a; color: #fff; border: 1px solid #444; margin-bottom: 15px; font-size: 13px;">
-                <option value="">-- Selecionar Material --</option>
+                <option value="">-- -- Select Material -- --</option>
                 <optgroup label="WOOD">
                     <option value="wood-rough">Rough Wood</option>
                     <option value="wood-finished">Finished Wood</option>
@@ -488,7 +488,7 @@
                         <div>Range: <span id="mat-range" style="color: #4a9eff; font-weight: 600;"></span></div>
                     </div>
                 </div>
-                <button class="copy-button" id="copy-material">Copiar RGB 0-1</button>
+                <button class="copy-button" id="copy-material">Copy RGB 0-1</button>
             </div>
         </div>
 
@@ -502,11 +502,11 @@
         </div>
 
         <!-- Botões -->
-        <button class="reset-button" onclick="resetValues()">Limpar Valores</button>
+        <button class="reset-button" onclick="resetValues()">Clear Values</button>
 
         <!-- Info -->
         <div class="info-box">
-            <strong>💡 Dica:</strong> Os valores devem estar em Linear RGB (0-1). Se tiver valores em sRGB, converta com gamma 2.2 antes.
+            <strong>💡 Tip:</strong> Values should be in Linear RGB (0-1). If you have sRGB values, convert with gamma 2.2 first.
         </div>
     </div>
 
@@ -591,7 +591,7 @@
             const factor = correctionFactorDisplay.textContent;
             navigator.clipboard.writeText(factor).then(() => {
                 const originalText = copyButton.textContent;
-                copyButton.textContent = '✓ Copiado!';
+                copyButton.textContent = '✓ Copied!';
                 copyButton.style.background = '#4cb050';
                 setTimeout(() => {
                     copyButton.textContent = originalText;
@@ -779,7 +779,7 @@
             navigator.clipboard.writeText(text).then(() => {
                 const btn = this;
                 const originalText = btn.textContent;
-                btn.textContent = '✓ Copiado!';
+                btn.textContent = '✓ Copied!';
                 btn.style.background = '#4cb050';
                 setTimeout(() => {
                     btn.textContent = originalText;
@@ -796,7 +796,7 @@
             navigator.clipboard.writeText(text).then(() => {
                 const btn = this;
                 const originalText = btn.textContent;
-                btn.textContent = '✓ Copiado!';
+                btn.textContent = '✓ Copied!';
                 btn.style.background = '#4cb050';
                 setTimeout(() => {
                     btn.textContent = originalText;
