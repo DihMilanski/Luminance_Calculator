@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luminância RGB Calculator - Rec.709</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #252525;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #ffffff;
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 80px;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        label {
+            color: #aaa;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        input[type="number"] {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #4a9eff;
+            box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+            background: #1f1f1f;
+        }
+
+        input[type="number"]::placeholder {
+            color: #555;
+        }
+
+        .weight {
+            color: #666;
+            font-size: 12px;
+            text-align: right;
+            padding-right: 10px;
+        }
+
+        .divider {
+            height: 1px;
+            background: #444;
+            margin: 25px 0;
+        }
+
+        .result-section {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .result-label {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-value {
+            color: #4a9eff;
+            font-size: 32px;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 12px;
+        }
+
+        .result-range {
+            color: #666;
+            font-size: 11px;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .range-check {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #333;
+        }
+
+        .material-type {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .material-name {
+            color: #aaa;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .material-range {
+            color: #666;
+            font-size: 10px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .status {
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .status.ok {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4cb050;
+            border: 1px solid #4cb050;
+        }
+
+        .status.warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border: 1px solid #ffc107;
+        }
+
+        .status.error {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+            border: 1px solid #f44336;
+        }
+
+        .correction-section {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .correction-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .correction-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .correction-label {
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="number"].correction-field {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .correction-result {
+            background: #2a2a2a;
+            border-left: 3px solid #4a9eff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+
+        .correction-result-label {
+            color: #888;
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+
+        .correction-result-value {
+            color: #4a9eff;
+            font-size: 20px;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+        }
+
+        .formula {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 25px;
+            color: #888;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        .copy-button {
+            background: #4a9eff;
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .copy-button:hover {
+            background: #357fd9;
+            box-shadow: 0 4px 12px rgba(74, 158, 255, 0.3);
+        }
+
+        .copy-button:active {
+            transform: scale(0.98);
+        }
+
+        .reset-button {
+            background: #333;
+            color: #aaa;
+            border: 1px solid #444;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .reset-button:hover {
+            background: #3a3a3a;
+            color: #bbb;
+        }
+
+        .info-box {
+            background: rgba(74, 158, 255, 0.05);
+            border: 1px solid #4a9eff;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Luminância RGB</h1>
+        <p class="subtitle">Rec.709 Calculator</p>
+
+        <!-- Input RGB -->
+        <div class="input-group">
+            <div class="input-row">
+                <label>R</label>
+                <input type="number" id="r" placeholder="0.0" min="0" max="1" step="0.0001">
+                <div class="weight">× 0.2126</div>
+            </div>
+            <div class="input-row">
+                <label>G</label>
+                <input type="number" id="g" placeholder="0.0" min="0" max="1" step="0.0001">
+                <div class="weight">× 0.7152</div>
+            </div>
+            <div class="input-row">
+                <label>B</label>
+                <input type="number" id="b" placeholder="0.0" min="0" max="1" step="0.0001">
+                <div class="weight">× 0.0722</div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Resultado Luminância -->
+        <div class="result-section">
+            <div class="result-label">Luminância (Linear)</div>
+            <div class="result-value" id="luminance">0.0000</div>
+            <div class="result-range">
+                <strong>Ranges Polyplant:</strong>
+                <div style="margin-top: 8px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span>Wood:</span>
+                        <span style="color: #4a9eff;">0.12 - 0.50</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span>Stone:</span>
+                        <span style="color: #4a9eff;">0.15 - 0.60</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span>Metal:</span>
+                        <span style="color: #4a9eff;">0.10 - 0.40</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                        <span>Soil:</span>
+                        <span style="color: #4a9eff;">0.08 - 0.30</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Foliage:</span>
+                        <span style="color: #4a9eff;">0.20 - 0.65</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="range-check">
+                <div class="material-type">
+                    <div class="material-name">Wood</div>
+                    <div class="status" id="wood-status"></div>
+                </div>
+                <div class="material-type">
+                    <div class="material-name">Stone</div>
+                    <div class="status" id="stone-status"></div>
+                </div>
+                <div class="material-type">
+                    <div class="material-name">Metal</div>
+                    <div class="status" id="metal-status"></div>
+                </div>
+                <div class="material-type">
+                    <div class="material-name">Soil</div>
+                    <div class="status" id="soil-status"></div>
+                </div>
+                <div class="material-type">
+                    <div class="material-name">Foliage</div>
+                    <div class="status" id="foliage-status"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Correção -->
+        <div class="correction-section">
+            <div class="result-label">Correção de Luminância</div>
+            <div class="correction-input-group">
+                <div class="correction-input">
+                    <span class="correction-label">Luminância Atual</span>
+                    <input type="number" id="current-lum" class="correction-field" placeholder="Auto" readonly>
+                </div>
+                <div class="correction-input">
+                    <span class="correction-label">Luminância Target</span>
+                    <input type="number" id="target-lum" class="correction-field" placeholder="0.30" min="0.01" max="1" step="0.01" value="0.30">
+                </div>
+            </div>
+
+            <div class="correction-result">
+                <div class="correction-result-label">Correction Factor</div>
+                <div class="correction-result-value" id="correction-factor">1.00x</div>
+            </div>
+
+            <button class="copy-button" id="copy-factor">Copiar Fator</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- RGB 0-255 Converter -->
+        <div class="correction-section">
+            <div class="result-label">RGB 0-255 → RGB 0-1 Converter</div>
+            <div class="correction-input-group">
+                <div class="correction-input">
+                    <span class="correction-label">R (0-255)</span>
+                    <input type="number" id="rgb255-r" class="correction-field" placeholder="192" min="0" max="255" step="1">
+                </div>
+                <div class="correction-input">
+                    <span class="correction-label">G (0-255)</span>
+                    <input type="number" id="rgb255-g" class="correction-field" placeholder="148" min="0" max="255" step="1">
+                </div>
+                <div class="correction-input">
+                    <span class="correction-label">B (0-255)</span>
+                    <input type="number" id="rgb255-b" class="correction-field" placeholder="102" min="0" max="255" step="1">
+                </div>
+            </div>
+
+            <div class="correction-result">
+                <div class="correction-result-label">Linear RGB 0-1</div>
+                <div style="color: #4a9eff; font-size: 14px; font-weight: 600; font-family: 'Courier New', monospace; margin-top: 8px;">
+                    R: <span id="rgb01-r">0.0000</span> | G: <span id="rgb01-g">0.0000</span> | B: <span id="rgb01-b">0.0000</span>
+                </div>
+            </div>
+
+            <button class="copy-button" id="copy-rgb01">Copiar RGB 0-1</button>
+        </div>
+
+        <!-- Material References Database -->
+        <div class="correction-section">
+            <div class="result-label">Material References (Polyplant)</div>
+            
+            <select id="material-select" style="width: 100%; padding: 10px; border-radius: 6px; background: #1a1a1a; color: #fff; border: 1px solid #444; margin-bottom: 15px; font-size: 13px;">
+                <option value="">-- Selecionar Material --</option>
+                <optgroup label="WOOD">
+                    <option value="wood-rough">Rough Wood</option>
+                    <option value="wood-finished">Finished Wood</option>
+                    <option value="wood-dark">Dark Wood</option>
+                </optgroup>
+                <optgroup label="STONE">
+                    <option value="stone-granite">Granite</option>
+                    <option value="stone-marble">Marble</option>
+                    <option value="stone-concrete">Concrete</option>
+                </optgroup>
+                <optgroup label="METAL">
+                    <option value="metal-steel">Steel</option>
+                    <option value="metal-copper">Copper</option>
+                    <option value="metal-aluminum">Aluminum</option>
+                </optgroup>
+                <optgroup label="FABRIC">
+                    <option value="fabric-cotton">Cotton</option>
+                    <option value="fabric-silk">Silk</option>
+                    <option value="fabric-wool">Wool</option>
+                </optgroup>
+                <optgroup label="PLASTIC">
+                    <option value="plastic-rough">Rough Plastic</option>
+                    <option value="plastic-smooth">Smooth Plastic</option>
+                </optgroup>
+                <optgroup label="ORGANIC">
+                    <option value="organic-skin">Skin</option>
+                    <option value="organic-leaf">Leaf</option>
+                    <option value="organic-soil">Soil</option>
+                </optgroup>
+            </select>
+
+            <div id="material-info" style="display: none;">
+                <div class="correction-result">
+                    <div class="correction-result-label" id="mat-name"></div>
+                    <div style="color: #4a9eff; font-size: 13px; font-family: 'Courier New', monospace; line-height: 1.8; margin-top: 10px;">
+                        <div>sRGB Hex: <span id="mat-srgb-hex" style="font-weight: 600;"></span></div>
+                        <div>Linear RGB: (<span id="mat-linear-r">0.000</span>, <span id="mat-linear-g">0.000</span>, <span id="mat-linear-b">0.000</span>)</div>
+                        <div style="margin-top: 8px; color: #888;">Luminance: <span id="mat-luminance" style="color: #4a9eff; font-weight: 600;"></span></div>
+                        <div>Range: <span id="mat-range" style="color: #4a9eff; font-weight: 600;"></span></div>
+                    </div>
+                </div>
+                <button class="copy-button" id="copy-material">Copiar RGB 0-1</button>
+            </div>
+        </div>
+
+        <!-- Fórmula -->
+        <div class="formula">
+            Fórmula Rec.709:<br>
+            Y = (R × 0.2126) + (G × 0.7152) + (B × 0.0722)<br>
+            <br>
+            Conversão 0-255 → 0-1:<br>
+            Value_0-1 = Value_0-255 ÷ 255
+        </div>
+
+        <!-- Botões -->
+        <button class="reset-button" onclick="resetValues()">Limpar Valores</button>
+
+        <!-- Info -->
+        <div class="info-box">
+            <strong>💡 Dica:</strong> Os valores devem estar em Linear RGB (0-1). Se tiver valores em sRGB, converta com gamma 2.2 antes.
+        </div>
+    </div>
+
+    <script>
+        const rInput = document.getElementById('r');
+        const gInput = document.getElementById('g');
+        const bInput = document.getElementById('b');
+        const luminanceDisplay = document.getElementById('luminance');
+        const currentLumInput = document.getElementById('current-lum');
+        const targetLumInput = document.getElementById('target-lum');
+        const correctionFactorDisplay = document.getElementById('correction-factor');
+        const copyButton = document.getElementById('copy-factor');
+
+        const ranges = {
+            wood: { min: 0.12, max: 0.50 },
+            stone: { min: 0.15, max: 0.60 },
+            metal: { min: 0.10, max: 0.40 },
+            soil: { min: 0.08, max: 0.30 },
+            foliage: { min: 0.20, max: 0.65 }
+        };
+
+        function calculate() {
+            const r = parseFloat(rInput.value) || 0;
+            const g = parseFloat(gInput.value) || 0;
+            const b = parseFloat(bInput.value) || 0;
+
+            const luminance = (r * 0.2126) + (g * 0.7152) + (b * 0.0722);
+
+            luminanceDisplay.textContent = luminance.toFixed(4);
+            currentLumInput.value = luminance.toFixed(4);
+
+            // Validar ranges
+            updateRangeStatus('wood', luminance);
+            updateRangeStatus('stone', luminance);
+            updateRangeStatus('metal', luminance);
+            updateRangeStatus('soil', luminance);
+            updateRangeStatus('foliage', luminance);
+
+            // Calcular fator de correção
+            const targetLum = parseFloat(targetLumInput.value) || 0.30;
+            const factor = luminance > 0 ? (targetLum / luminance) : 1;
+            correctionFactorDisplay.textContent = factor.toFixed(2) + 'x';
+        }
+
+        function updateRangeStatus(material, luminance) {
+            const range = ranges[material];
+            const statusEl = document.getElementById(material + '-status');
+            let status = '';
+            let className = '';
+
+            if (luminance >= range.min && luminance <= range.max) {
+                status = '✓ OK';
+                className = 'ok';
+            } else if (luminance < range.min) {
+                status = '⚠ Too Dark';
+                className = 'warning';
+            } else {
+                status = '✗ Too Bright';
+                className = 'error';
+            }
+
+            statusEl.textContent = status;
+            statusEl.className = 'status ' + className;
+        }
+
+        function resetValues() {
+            rInput.value = '';
+            gInput.value = '';
+            bInput.value = '';
+            targetLumInput.value = '0.30';
+            luminanceDisplay.textContent = '0.0000';
+            currentLumInput.value = '';
+            correctionFactorDisplay.textContent = '1.00x';
+
+            document.querySelectorAll('.status').forEach(el => {
+                el.textContent = '';
+                el.className = 'status';
+            });
+        }
+
+        function copyToClipboard() {
+            const factor = correctionFactorDisplay.textContent;
+            navigator.clipboard.writeText(factor).then(() => {
+                const originalText = copyButton.textContent;
+                copyButton.textContent = '✓ Copiado!';
+                copyButton.style.background = '#4cb050';
+                setTimeout(() => {
+                    copyButton.textContent = originalText;
+                    copyButton.style.background = '#4a9eff';
+                }, 2000);
+            });
+        }
+
+        // Material Database
+        const materialsDB = {
+            'wood-rough': {
+                name: 'Rough Wood',
+                srgb_hex: 'e0c7a8',
+                linear: [0.745, 0.573, 0.392],
+                range: '0.12 - 0.50'
+            },
+            'wood-finished': {
+                name: 'Finished Wood',
+                srgb_hex: 'c9a876',
+                linear: [0.618, 0.458, 0.297],
+                range: '0.12 - 0.50'
+            },
+            'wood-dark': {
+                name: 'Dark Wood',
+                srgb_hex: '6b5344',
+                linear: [0.261, 0.168, 0.120],
+                range: '0.12 - 0.50'
+            },
+            'stone-granite': {
+                name: 'Granite',
+                srgb_hex: '7a7a7a',
+                linear: [0.433, 0.433, 0.433],
+                range: '0.15 - 0.60'
+            },
+            'stone-marble': {
+                name: 'Marble',
+                srgb_hex: 'e8e8e8',
+                linear: [0.895, 0.895, 0.895],
+                range: '0.15 - 0.60'
+            },
+            'stone-concrete': {
+                name: 'Concrete',
+                srgb_hex: '9d9b96',
+                linear: [0.578, 0.566, 0.540],
+                range: '0.15 - 0.60'
+            },
+            'metal-steel': {
+                name: 'Steel',
+                srgb_hex: 'bebebe',
+                linear: [0.707, 0.707, 0.707],
+                range: '0.10 - 0.40'
+            },
+            'metal-copper': {
+                name: 'Copper',
+                srgb_hex: 'd4af37',
+                linear: [0.824, 0.641, 0.208],
+                range: '0.10 - 0.40'
+            },
+            'metal-aluminum': {
+                name: 'Aluminum',
+                srgb_hex: 'd0d0d0',
+                linear: [0.791, 0.791, 0.791],
+                range: '0.10 - 0.40'
+            },
+            'fabric-cotton': {
+                name: 'Cotton',
+                srgb_hex: 'f5f5f0',
+                linear: [0.954, 0.954, 0.936],
+                range: '0.20 - 0.65'
+            },
+            'fabric-silk': {
+                name: 'Silk',
+                srgb_hex: 'e8e3d8',
+                linear: [0.895, 0.875, 0.829],
+                range: '0.20 - 0.65'
+            },
+            'fabric-wool': {
+                name: 'Wool',
+                srgb_hex: 'a99b8f',
+                linear: [0.643, 0.600, 0.545],
+                range: '0.20 - 0.65'
+            },
+            'plastic-rough': {
+                name: 'Rough Plastic',
+                srgb_hex: 'b8b8b8',
+                linear: [0.689, 0.689, 0.689],
+                range: '0.10 - 0.40'
+            },
+            'plastic-smooth': {
+                name: 'Smooth Plastic',
+                srgb_hex: 'd9d9d9',
+                linear: [0.824, 0.824, 0.824],
+                range: '0.10 - 0.40'
+            },
+            'organic-skin': {
+                name: 'Skin',
+                srgb_hex: 'e8a591',
+                linear: [0.895, 0.627, 0.557],
+                range: '0.20 - 0.50'
+            },
+            'organic-leaf': {
+                name: 'Leaf',
+                srgb_hex: '4a7c3c',
+                linear: [0.207, 0.418, 0.207],
+                range: '0.20 - 0.65'
+            },
+            'organic-soil': {
+                name: 'Soil',
+                srgb_hex: '5d4e37',
+                linear: [0.261, 0.217, 0.170],
+                range: '0.08 - 0.30'
+            }
+        };
+
+        // RGB 0-255 to 0-1 Converter
+        const rgb255Inputs = {
+            r: document.getElementById('rgb255-r'),
+            g: document.getElementById('rgb255-g'),
+            b: document.getElementById('rgb255-b')
+        };
+
+        const rgb01Display = {
+            r: document.getElementById('rgb01-r'),
+            g: document.getElementById('rgb01-g'),
+            b: document.getElementById('rgb01-b')
+        };
+
+        function convertRGB255to01() {
+            const r = parseFloat(rgb255Inputs.r.value) || 0;
+            const g = parseFloat(rgb255Inputs.g.value) || 0;
+            const b = parseFloat(rgb255Inputs.b.value) || 0;
+
+            const r01 = (r / 255).toFixed(6);
+            const g01 = (g / 255).toFixed(6);
+            const b01 = (b / 255).toFixed(6);
+
+            rgb01Display.r.textContent = r01;
+            rgb01Display.g.textContent = g01;
+            rgb01Display.b.textContent = b01;
+
+            // Também preenche o primeiro input com valores
+            rInput.value = r01;
+            gInput.value = g01;
+            bInput.value = b01;
+            calculate();
+        }
+
+        // Material Select
+        const materialSelect = document.getElementById('material-select');
+        const materialInfo = document.getElementById('material-info');
+
+        materialSelect.addEventListener('change', function() {
+            if (!this.value) {
+                materialInfo.style.display = 'none';
+                return;
+            }
+
+            const mat = materialsDB[this.value];
+            if (!mat) return;
+
+            document.getElementById('mat-name').textContent = mat.name;
+            document.getElementById('mat-srgb-hex').textContent = '#' + mat.srgb_hex.toUpperCase();
+            document.getElementById('mat-linear-r').textContent = mat.linear[0].toFixed(3);
+            document.getElementById('mat-linear-g').textContent = mat.linear[1].toFixed(3);
+            document.getElementById('mat-linear-b').textContent = mat.linear[2].toFixed(3);
+            
+            const lum = (mat.linear[0] * 0.2126) + (mat.linear[1] * 0.7152) + (mat.linear[2] * 0.0722);
+            document.getElementById('mat-luminance').textContent = lum.toFixed(4);
+            document.getElementById('mat-range').textContent = mat.range;
+
+            materialInfo.style.display = 'block';
+
+            // Preenche os inputs
+            rInput.value = mat.linear[0].toFixed(6);
+            gInput.value = mat.linear[1].toFixed(6);
+            bInput.value = mat.linear[2].toFixed(6);
+            calculate();
+        });
+
+        document.getElementById('copy-material').addEventListener('click', function() {
+            const mat = materialsDB[materialSelect.value];
+            if (!mat) return;
+            
+            const text = `(${mat.linear[0].toFixed(3)}, ${mat.linear[1].toFixed(3)}, ${mat.linear[2].toFixed(3)})`;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = this;
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copiado!';
+                btn.style.background = '#4cb050';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#4a9eff';
+                }, 2000);
+            });
+        });
+
+        document.getElementById('copy-rgb01').addEventListener('click', function() {
+            const r = rgb01Display.r.textContent;
+            const g = rgb01Display.g.textContent;
+            const b = rgb01Display.b.textContent;
+            const text = `(${r}, ${g}, ${b})`;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = this;
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copiado!';
+                btn.style.background = '#4cb050';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#4a9eff';
+                }, 2000);
+            });
+        });
+
+        // Event listeners
+        [rInput, gInput, bInput, targetLumInput].forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        [rgb255Inputs.r, rgb255Inputs.g, rgb255Inputs.b].forEach(input => {
+            input.addEventListener('input', convertRGB255to01);
+        });
+
+        copyButton.addEventListener('click', copyToClipboard);
+
+        // Calcular ao carregar
+        calculate();
+    </script>
+</body>
+</html>
